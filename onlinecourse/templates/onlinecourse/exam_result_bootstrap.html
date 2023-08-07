@@ -36,20 +36,66 @@
 </nav>
 
 <div class="container-fluid">
-    {% if grade > 80 %}
-    <div class="alert alert-success">
-       <!--HINT Display passed info -->
-    </div>
-        {% else %}
+    {% if grade_percentage > 0.8 %}
+        <div class="alert alert-success">
+            Congratulations, {{ user.username }}! You have passed the exam and completed the course with a score of {{ grade }} / {{totalpossiblescore}}.
+        </div>
+    {% else %}
         <div class="alert alert-danger">
-            <!--HINT Display failed info -->
+            Sorry, {{ user.username }}! You have failed the exam with a score of {{ grade }} / {{totalpossiblescore}}.
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
-        {% endif %}
-        <div class="card-columns-vertical mt-1">
+    {% endif %}
+    
+    <div class="card-columns-vertical mt-1">
         <h5 class="">Exam results</h5>
-            <!--HINT Display exam results-->
-        </div>
+        
+        <!-- Iterate through choice_results_grouped to display exam results -->
+        {% for question, question_choices in choice_results_grouped.items %}
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">{{ question.questiontext }}</h6>
+                    <ul class="list-unstyled">
+                        {% for result in question_choices %}
+                            <div class="form-check">
+                                <label class="form-check-label
+                                    {% if result.is_correct %}
+                                        {% if result.is_selected %}
+                                            text-success
+                                        {% else %}
+                                            text-warning
+                                        {% endif %}
+                                    {% elif result.is_selected %}
+                                        text-danger
+                                    {% endif %}">
+                                    {% if result.is_correct %}
+                                        {% if result.is_selected %}
+                                            Correct Answer: 
+                                        {% else %}
+                                            Not Selected: 
+                                        {% endif %}
+                                    {% elif not result.is_correct and result.is_selected %}
+                                        Wrong Answer: 
+                                    {% endif %}
+                                
+                                    
+                                    {{ result.choice.choicecontent }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
     </div>
+</div>
+
+
+
+
+
+
+
+
 </body>
 </html>
